@@ -1,0 +1,3089 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academic &amp; Engineering Progress Tracker</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            zinc: {
+              950: '#09090b',
+              900: '#121215',
+              850: '#18181b',
+              800: '#27272a',
+              750: '#323238',
+              700: '#3f3f46',
+              600: '#52525b',
+              500: '#71717a',
+              400: '#a1a1aa',
+              300: '#d4d4d8',
+              200: '#e4e4e7',
+              100: '#f4f4f5',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+
+    /* Date input custom styling */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.8) brightness(1.2);
+      cursor: pointer;
+    }
+
+    /* Smooth animations */
+    .fade-enter {
+      animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Range slider accent */
+    input[type="range"] {
+      accent-color: #10b981;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- ========================================================================= -->
+  <!-- TOP APP HEADER & NAVIGATION -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-40 bg-zinc-950/85 backdrop-blur-md border-b border-zinc-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+
+      <!-- Brand & Status -->
+      <div class="flex items-center gap-3">
+        <div
+          class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-zinc-950 shadow-md shadow-emerald-500/20 font-bold">
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-bold text-zinc-100 tracking-tight leading-none">
+              Academic Tracker
+            </h1>
+            <span
+              class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              Local DB
+            </span>
+          </div>
+          <p class="text-[11px] text-zinc-400 leading-none mt-1 hidden sm:block">
+            Engineering, College &amp; Startup Cadence
+          </p>
+        </div>
+      </div>
+
+      <!-- Center: Date Controls -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button id="btn-prev-day" title="Previous Day"
+          class="p-1.5 sm:p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition active:scale-95">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </button>
+
+        <div class="relative flex items-center">
+          <input type="date" id="date-picker-input"
+            class="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-mono font-medium bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 focus:outline-none focus:border-emerald-500/80 transition" />
+        </div>
+
+        <button id="btn-next-day" title="Next Day"
+          class="p-1.5 sm:p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition active:scale-95">
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+
+        <button id="btn-today"
+          class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition active:scale-95">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Today
+        </button>
+      </div>
+
+      <!-- Right: Screen Nav Tabs & Quick Add -->
+      <div class="flex items-center gap-2">
+        <!-- Desktop Nav Buttons -->
+        <nav
+          class="hidden lg:flex items-center gap-1 bg-zinc-900/90 p-1 rounded-xl border border-zinc-800 text-xs font-semibold">
+          <button data-nav="today"
+            class="nav-tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 transition">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Today
+          </button>
+          <button data-nav="weekly"
+            class="nav-tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 transition">
+            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Weekly
+          </button>
+          <button data-nav="monthly"
+            class="nav-tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 transition">
+            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> Monthly Analytics
+          </button>
+          <button data-nav="settings"
+            class="nav-tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 transition">
+            <i data-lucide="settings" class="w-3.5 h-3.5"></i> Backup &amp; Config
+          </button>
+        </nav>
+
+        <!-- Quick Add Button -->
+        <button id="btn-open-quick-add"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-zinc-950 text-xs font-bold transition shadow-sm shadow-emerald-500/20 active:scale-95">
+          <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
+          <span class="hidden sm:inline">Quick Add</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <!-- ========================================================================= -->
+  <main id="app-viewport" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <!-- Screen contents dynamically injected here -->
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MOBILE BOTTOM NAVIGATION -->
+  <!-- ========================================================================= -->
+  <nav
+    class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800/80 px-2 py-2 flex items-center justify-around text-[10px] font-semibold text-zinc-400">
+    <button data-nav="today" class="mobile-nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition">
+      <i data-lucide="calendar" class="w-4 h-4"></i>
+      <span>Today</span>
+    </button>
+    <button data-nav="weekly" class="mobile-nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition">
+      <i data-lucide="layout-grid" class="w-4 h-4"></i>
+      <span>Weekly</span>
+    </button>
+    <button data-nav="monthly" class="mobile-nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition">
+      <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+      <span>Analytics</span>
+    </button>
+    <button data-nav="settings" class="mobile-nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition">
+      <i data-lucide="settings" class="w-4 h-4"></i>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- ========================================================================= -->
+  <!-- QUICK ADD MODAL -->
+  <!-- ========================================================================= -->
+  <div id="quick-add-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md bg-zinc-900 border border-zinc-700/80 rounded-2xl p-5 shadow-2xl space-y-4 fade-enter">
+      <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-bold text-zinc-100 text-sm">Quick Add Item</h3>
+        </div>
+        <button id="btn-close-quick-add"
+          class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Quick Add Category Selector -->
+      <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
+        <button id="qa-tab-academic"
+          class="qa-type-btn py-2 px-2.5 rounded-xl border bg-emerald-500/15 border-emerald-500/40 text-emerald-300 flex items-center justify-center gap-1.5">
+          <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Academic
+        </button>
+        <button id="qa-tab-startup"
+          class="qa-type-btn py-2 px-2.5 rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200 flex items-center justify-center gap-1.5">
+          <i data-lucide="rocket" class="w-3.5 h-3.5"></i> Startup
+        </button>
+        <button id="qa-tab-lecture"
+          class="qa-type-btn py-2 px-2.5 rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200 flex items-center justify-center gap-1.5">
+          <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> Lecture
+        </button>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="quick-add-form" class="space-y-3">
+        <div>
+          <label class="text-xs font-semibold text-zinc-400 block mb-1">Title / Name</label>
+          <input type="text" id="qa-input-title" placeholder="e.g. Solve 2 Graph questions or Review compiler notes"
+            required
+            class="w-full px-3 py-2 text-sm rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition" />
+        </div>
+
+        <div id="qa-task-extras" class="grid grid-cols-2 gap-3 text-xs">
+          <div>
+            <label class="font-semibold text-zinc-400 block mb-1">Priority</label>
+            <select id="qa-select-priority"
+              class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-emerald-500">
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-semibold text-zinc-400 block mb-1">Est. Time</label>
+            <input type="text" id="qa-input-estimate" placeholder="45m" value="45m"
+              class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-emerald-500" />
+          </div>
+        </div>
+
+        <div id="qa-lecture-extras" class="grid grid-cols-2 gap-3 text-xs hidden">
+          <div>
+            <label class="font-semibold text-zinc-400 block mb-1">Time Slot</label>
+            <input type="text" id="qa-input-slot" placeholder="09:00 - 10:00 AM" value="10:00 - 11:00 AM"
+              class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-emerald-500" />
+          </div>
+          <div>
+            <label class="font-semibold text-zinc-400 block mb-1">Topic</label>
+            <input type="text" id="qa-input-topic" placeholder="e.g. Distributed Consensus"
+              class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-emerald-500" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancel-quick-add"
+            class="px-4 py-2 text-xs font-semibold rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition">
+            Cancel
+          </button>
+          <button type="submit"
+            class="px-4 py-2 text-xs font-bold rounded-xl bg-emerald-500 hover:bg-emerald-600 text-zinc-950 shadow-md shadow-emerald-500/20 transition">
+            Add to Today
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Hidden File Input for JSON Backup Import -->
+  <input type="file" id="file-import-input" accept=".json,application/json" class="hidden" />
+
+  <!-- ========================================================================= -->
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <!-- ========================================================================= -->
+  <div id="toast-container" class="fixed bottom-16 lg:bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none">
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <!-- ========================================================================= -->
+  <script>
+    /**
+     * Academic & Engineering Progress Tracker
+     * Standalone Single-File Application
+     * Storage key: 'academic_tracker_db'
+     */
+
+    const STORAGE_KEY = 'academic_tracker_db';
+
+    // Application state
+    const state = {
+      activeScreen: 'today', // 'today' | 'weekly' | 'monthly' | 'settings'
+      currentDate: getTodayISO(),
+      todaySubTab: 'routine', // 'routine' | 'pillars'
+      monthView: {
+        year: new Date().getFullYear(),
+        month: new Date().getMonth(), // 0-indexed
+      },
+      qaType: 'academic',
+      db: null,
+      showMonthlyAnalyticsCollapsible: false,
+    };
+
+    // =========================================================================
+    // UTILITIES
+    // =========================================================================
+    function getTodayISO() {
+      const now = new Date();
+      return formatISO(now);
+    }
+
+    function formatISO(d) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseISODate(isoStr) {
+      if (!isoStr) return new Date();
+      const [y, m, d] = isoStr.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function formatDisplayDate(isoStr) {
+      const d = parseISODate(isoStr);
+      return d.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    function getDayOfWeek(isoStr) {
+      const d = parseISODate(isoStr);
+      return d.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+    }
+
+    function generateId(prefix = 'id') {
+      return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const icon = type === 'success'
+        ? '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>'
+        : '<i data-lucide="info" class="w-4 h-4 text-sky-400"></i>';
+
+      toast.className = 'pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-zinc-900/95 border border-zinc-750 text-zinc-100 text-xs shadow-xl shadow-black/40 fade-enter';
+      toast.innerHTML = `
+        ${icon}
+        <span class="font-medium">${message}</span>
+      `;
+
+      container.appendChild(toast);
+      if (window.lucide) lucide.createIcons();
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    // =========================================================================
+    // TEMPLATE GENERATOR & SEED DATA
+    // =========================================================================
+    function generateTemplateBlocks(dateStr, saturdayCollegeMode = false) {
+      const dayOfWeek = getDayOfWeek(dateStr);
+
+      // Weekday (Mon–Fri: days 1–5) OR Saturday with College Mode active (day 6 && saturdayCollegeMode)
+      if ((dayOfWeek >= 1 && dayOfWeek <= 5) || (dayOfWeek === 6 && saturdayCollegeMode)) {
+        return [
+          {
+            id: `block-${dateStr}-gym`,
+            key: 'gym',
+            title: 'Gym',
+            timeSlot: '07:00 - 08:00',
+            category: 'gym',
+            hasTextarea: false,
+            completed: false,
+            notes: '',
+          },
+          {
+            id: `block-${dateStr}-college`,
+            key: 'college',
+            title: 'College Lectures',
+            timeSlot: '09:00 - 17:00',
+            category: 'college',
+            hasTextarea: false,
+            completed: false,
+            notes: '',
+            totalLectures: 6,
+            lecturesAttended: 0,
+            lectureStatus: [false, false, false, false, false, false],
+          },
+          {
+            id: `block-${dateStr}-rest`,
+            key: 'rest',
+            title: 'Rest & Reset',
+            timeSlot: '17:00 - 18:00',
+            category: 'rest',
+            hasTextarea: false,
+            completed: false,
+            notes: '',
+          },
+          {
+            id: `block-${dateStr}-academic`,
+            key: 'academic',
+            title: 'Academic Work',
+            timeSlot: '18:00 - 20:00',
+            category: 'academic',
+            hasTextarea: true,
+            textareaPlaceholder: 'Topics, assignments, notes...',
+            completed: false,
+            notes: '',
+          },
+          {
+            id: `block-${dateStr}-dinner`,
+            key: 'dinner',
+            title: 'Dinner & Chill',
+            timeSlot: '20:00 - 22:00',
+            category: 'dinner',
+            hasTextarea: false,
+            completed: false,
+            notes: '',
+          },
+          {
+            id: `block-${dateStr}-startup`,
+            key: 'startup',
+            title: 'Startup Sprint',
+            timeSlot: '22:00 - 23:30',
+            category: 'startup',
+            hasTextarea: true,
+            textareaPlaceholder: 'Tasks done, features shipped, notes...',
+            completed: false,
+            notes: '',
+          },
+        ];
+      }
+
+      // Saturday (When Regular College Today is OFF - Default)
+      if (dayOfWeek === 6 && !saturdayCollegeMode) {
+        return [
+          {
+            id: `block-${dateStr}-gym`,
+            key: 'gym',
+            title: 'Gym',
+            timeSlot: '07:00 - 08:00',
+            category: 'gym',
+            hasTextarea: false,
+            completed: false,
+            notes: '',
+          },
+          {
+            id: `block-${dateStr}-rev1`,
+            key: 'rev1',
+            title: 'Revision Block 1',
+            timeSlot: '10:00 - 12:00',
+            category: 'revision',
+            hasTextarea: true,
+            textareaPlaceholder: 'Topics, problem sets, notes...',
+            completed: false,
+            notes: '',
+          },
+          {
+            id: `block-${dateStr}-rev2`,
+            key: 'rev2',
+            title: 'Revision Block 2',
+            timeSlot: '14:00 - 16:00',
+            category: 'revision',
+            hasTextarea: true,
+            textareaPlaceholder: 'Topics, problem sets, notes...',
+            completed: false,
+            notes: '',
+          },
+          {
+            id: `block-${dateStr}-startup`,
+            key: 'startup',
+            title: 'Startup Sprint',
+            timeSlot: '18:00 - 20:00',
+            category: 'startup',
+            hasTextarea: true,
+            textareaPlaceholder: 'Tasks done, deliverables, roadmap...',
+            completed: false,
+            notes: '',
+          },
+        ];
+      }
+
+      // Sunday (Recovery & Deep Revision - No Gym block)
+      return [
+        {
+          id: `block-${dateStr}-rev1`,
+          key: 'rev1',
+          title: 'Revision Block 1',
+          timeSlot: '10:00 - 12:00',
+          category: 'revision',
+          hasTextarea: true,
+          textareaPlaceholder: 'Topics, problem sets, notes...',
+          completed: false,
+          notes: '',
+        },
+        {
+          id: `block-${dateStr}-rev2`,
+          key: 'rev2',
+          title: 'Revision Block 2',
+          timeSlot: '14:00 - 16:00',
+          category: 'revision',
+          hasTextarea: true,
+          textareaPlaceholder: 'Topics, problem sets, notes...',
+          completed: false,
+          notes: '',
+        },
+        {
+          id: `block-${dateStr}-startup`,
+          key: 'startup',
+          title: 'Startup Sprint',
+          timeSlot: '18:00 - 20:00',
+          category: 'startup',
+          hasTextarea: true,
+          textareaPlaceholder: 'Tasks done, weekly roadmap, review...',
+          completed: false,
+          notes: '',
+        },
+      ];
+    }
+
+    function getBlockKey(id, category) {
+      if (!id) return category || 'unknown';
+      if (id.includes('-gym')) return 'gym';
+      if (id.includes('-college')) return 'college';
+      if (id.includes('-rest')) return 'rest';
+      if (id.includes('-academic')) return 'academic';
+      if (id.includes('-dinner')) return 'dinner';
+      if (id.includes('-startup')) return 'startup';
+      if (id.includes('-rev1')) return 'rev1';
+      if (id.includes('-rev2')) return 'rev2';
+      return category || id;
+    }
+
+    function syncRoutineBlocks(log) {
+      const isSatCollege = !!log.saturday_college_mode;
+      const expectedBlocks = generateTemplateBlocks(log.date, isSatCollege);
+
+      if (!Array.isArray(log.schedule_blocks) || log.schedule_blocks.length === 0) {
+        log.schedule_blocks = expectedBlocks;
+        return;
+      }
+
+      const currentKeys = log.schedule_blocks.map(b => b.key || getBlockKey(b.id, b.category));
+      const expectedKeys = expectedBlocks.map(b => b.key);
+
+      const isMatch = currentKeys.length === expectedKeys.length &&
+        currentKeys.every((k, i) => k === expectedKeys[i]);
+
+      if (isMatch) {
+        log.schedule_blocks = log.schedule_blocks.map((b, idx) => {
+          const exp = expectedBlocks[idx];
+          return {
+            ...exp,
+            completed: !!b.completed,
+            notes: b.notes || '',
+            lectureStatus: b.lectureStatus || exp.lectureStatus,
+            lecturesAttended: (b.lecturesAttended !== undefined) ? b.lecturesAttended : (b.lectureStatus ? b.lectureStatus.filter(Boolean).length : exp.lecturesAttended),
+          };
+        });
+        return;
+      }
+
+      // Preserve previously saved states across template switches
+      const prevMap = {};
+      log.schedule_blocks.forEach(b => {
+        const k = b.key || getBlockKey(b.id, b.category);
+        prevMap[k] = b;
+        if (b.category) prevMap[b.category] = b;
+      });
+
+      log.schedule_blocks = expectedBlocks.map(exp => {
+        const prev = prevMap[exp.key] || prevMap[exp.category];
+        if (prev) {
+          return {
+            ...exp,
+            completed: !!prev.completed,
+            notes: prev.notes || '',
+            lectureStatus: prev.lectureStatus || exp.lectureStatus,
+            lecturesAttended: (prev.lecturesAttended !== undefined) ? prev.lecturesAttended : (prev.lectureStatus ? prev.lectureStatus.filter(Boolean).length : exp.lecturesAttended),
+          };
+        }
+        return exp;
+      });
+    }
+
+    function createBlankLog(dateStr) {
+      const isWeekend = getDayOfWeek(dateStr) === 0 || getDayOfWeek(dateStr) === 6;
+      return {
+        id: `log-${dateStr}`,
+        date: dateStr,
+        wake_up_time: '06:45',
+        sleep_time: '23:45',
+        sleep_hours: 7.0,
+        mood: 'good',
+        energy_level: 4,
+        water_liters: 2.5,
+        workout_completed: false,
+        workout_notes: '',
+        schedule_blocks: generateTemplateBlocks(dateStr, false),
+        saturday_college_mode: false,
+        college_lectures_count: isWeekend ? 0 : 5,
+        dsa_solved: 0,
+        dsa_notes: '',
+        study_hours: 0,
+        academic_tasks: [
+          {
+            id: `task-acad-${dateStr}-1`,
+            title: 'Review lecture notes & synthesis',
+            completed: false,
+            category: 'academic',
+            priority: 'medium',
+            timeEstimate: '45m'
+          }
+        ],
+        startup_hours: 0,
+        startup_tasks: [
+          {
+            id: `task-start-${dateStr}-1`,
+            title: 'Ship customer feedback updates',
+            completed: false,
+            category: 'startup',
+            priority: 'high',
+            timeEstimate: '1h 30m'
+          }
+        ],
+        startup_notes: '',
+        daily_highlight: '',
+        blockers: '',
+        rating: 8,
+        lectures: isWeekend ? [] : [
+          {
+            id: `lec-${dateStr}-1`,
+            lecture_number: 1,
+            subject_name: 'Distributed Systems',
+            attended: false,
+            topic: 'Raft Consensus & Leader Election',
+            notes: '',
+            time_slot: '09:00 - 10:00 AM'
+          },
+          {
+            id: `lec-${dateStr}-2`,
+            lecture_number: 2,
+            subject_name: 'Computer Networks',
+            attended: false,
+            topic: 'TCP Congestion Control Algorithms',
+            notes: '',
+            time_slot: '10:15 - 11:15 AM'
+          },
+          {
+            id: `lec-${dateStr}-3`,
+            lecture_number: 3,
+            subject_name: 'Machine Learning',
+            attended: false,
+            topic: 'Backpropagation & Gradient Vanishing',
+            notes: '',
+            time_slot: '11:30 - 12:30 PM'
+          },
+          {
+            id: `lec-${dateStr}-4`,
+            lecture_number: 4,
+            subject_name: 'Compiler Design',
+            attended: false,
+            topic: 'Syntax-Directed Translation & DFA',
+            notes: '',
+            time_slot: '02:00 - 03:00 PM'
+          }
+        ]
+      };
+    }
+
+    function generateSeedDatabase() {
+      const dailyLogs = {};
+      const today = new Date();
+
+      // Seed 30 past days with realistic logs
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const dateStr = formatISO(d);
+        const isToday = i === 0;
+        const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+
+        const blocks = generateTemplateBlocks(dateStr, false);
+        // Mark some blocks completed for history
+        blocks.forEach((b, idx) => {
+          if (!isToday) {
+            b.completed = (i + idx) % 2 === 0 || idx < 3;
+            if (b.category === 'college') {
+              b.lectureStatus = [true, true, true, (i % 3 !== 0), (i % 4 !== 0), true];
+              b.lecturesAttended = b.lectureStatus.filter(Boolean).length;
+            }
+          }
+        });
+
+        const academicTasks = [
+          {
+            id: `acad-${dateStr}-1`,
+            title: 'Review Distributed Systems Raft consensus paper',
+            completed: isToday ? false : i % 3 !== 0,
+            category: 'academic',
+            priority: 'high',
+            timeEstimate: '45m',
+          },
+          {
+            id: `acad-${dateStr}-2`,
+            title: 'Complete CN socket programming lab submission',
+            completed: isToday ? true : i % 2 === 0,
+            category: 'academic',
+            priority: 'medium',
+            timeEstimate: '1h 15m',
+          },
+        ];
+
+        const startupTasks = [
+          {
+            id: `startup-${dateStr}-1`,
+            title: 'Build clean dark-mode tracker dashboard UI',
+            completed: isToday ? true : i % 2 !== 0,
+            category: 'startup',
+            priority: 'high',
+            timeEstimate: '2h',
+          },
+          {
+            id: `startup-${dateStr}-2`,
+            title: 'Implement robust localStorage schema & JSON backup',
+            completed: isToday ? true : i % 4 !== 0,
+            category: 'startup',
+            priority: 'high',
+            timeEstimate: '1h 30m',
+          },
+        ];
+
+        const lectures = isWeekend
+          ? []
+          : [
+            {
+              id: `lec-${dateStr}-1`,
+              lecture_number: 1,
+              subject_name: 'Distributed Systems',
+              attended: isToday ? true : i % 7 !== 2,
+              topic: 'Byzantine Fault Tolerance & Consensus',
+              notes: 'Compare Paxos leader lease with Raft heartbeat timeouts',
+              time_slot: '09:00 - 10:00 AM',
+            },
+            {
+              id: `lec-${dateStr}-2`,
+              lecture_number: 2,
+              subject_name: 'Computer Networks',
+              attended: isToday ? true : i % 5 !== 0,
+              topic: 'TCP Congestion Window & AIMD',
+              notes: 'Additive increase, multiplicative decrease derivation',
+              time_slot: '10:15 - 11:15 AM',
+            },
+            {
+              id: `lec-${dateStr}-3`,
+              lecture_number: 3,
+              subject_name: 'Machine Learning',
+              attended: isToday ? false : i % 6 !== 1,
+              topic: 'Residual Connections & LayerNorm',
+              notes: 'Skip connections prevent gradient vanishing in deep nets',
+              time_slot: '11:30 - 12:30 PM',
+            },
+            {
+              id: `lec-${dateStr}-4`,
+              lecture_number: 4,
+              subject_name: 'Compiler Design',
+              attended: isToday ? true : true,
+              topic: 'LR(1) Item Sets & Parsing Tables',
+              notes: 'DFA state transitions for lookahead symbols',
+              time_slot: '02:00 - 03:00 PM',
+            },
+          ];
+
+        dailyLogs[dateStr] = {
+          id: `log-${dateStr}`,
+          date: dateStr,
+          wake_up_time: '06:45',
+          sleep_time: '23:45',
+          sleep_hours: isWeekend ? 7.5 : 7.0,
+          mood: i % 4 === 0 ? 'great' : i % 3 === 0 ? 'neutral' : 'good',
+          energy_level: (i % 3) + 3,
+          water_liters: 2.8,
+          workout_completed: i % 2 === 0 || isToday,
+          workout_notes: 'Push day + 20m Zone 2 cardio',
+          dsa_solved: isWeekend ? 3 : (i % 3) + 1,
+          dsa_notes: 'LeetCode 200 (Number of Islands) & 207 (Course Schedule)',
+          study_hours: isWeekend ? 2.5 : 4.0,
+          academic_tasks: academicTasks,
+          startup_hours: isWeekend ? 5.0 : 3.5,
+          startup_tasks: startupTasks,
+          startup_notes: 'Architected offline-first local data syncing.',
+          daily_highlight: isToday
+            ? 'Shipped zero-dependency production Academic Tracker!'
+            : 'Crushed topological sort and 100% lecture attendance.',
+          blockers: 'None',
+          rating: isWeekend ? 9 : 8,
+          schedule_blocks: blocks,
+          saturday_college_mode: false,
+          college_lectures_count: isWeekend ? 0 : 5,
+          lectures,
+        };
+      }
+
+      return {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        settings: {
+          userName: 'Dhruv',
+          targetStudyHours: 4,
+          targetStartupHours: 3,
+          targetDsaCount: 2,
+          lectureSubjects: [
+            'Distributed Systems',
+            'Computer Networks',
+            'Machine Learning',
+            'Compiler Design',
+          ],
+        },
+        dailyLogs,
+      };
+    }
+
+    // =========================================================================
+    // STORAGE ENGINE
+    // =========================================================================
+    function loadDatabase() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.dailyLogs && parsed.settings) {
+            return parsed;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to parse database from localStorage:', err);
+      }
+
+      // Fallback initialization
+      const seed = generateSeedDatabase();
+      saveDatabase(seed);
+      return seed;
+    }
+
+    function saveDatabase(dbInstance = state.db) {
+      if (!dbInstance) return;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dbInstance));
+      } catch (err) {
+        console.error('Failed to save database to localStorage:', err);
+        showToast('Storage quota exceeded or error saving!', 'error');
+      }
+    }
+
+    function getOrInitLog(dateStr) {
+      if (!state.db.dailyLogs[dateStr]) {
+        state.db.dailyLogs[dateStr] = createBlankLog(dateStr);
+        saveDatabase();
+      }
+      const log = state.db.dailyLogs[dateStr];
+      if (log.sleep_hours === undefined || log.sleep_hours === null) {
+        log.sleep_hours = 7.0;
+      }
+      syncRoutineBlocks(log);
+      return log;
+    }
+
+    // =========================================================================
+    // SCORING ENGINE
+    // =========================================================================
+    function calculateDailyScore(log) {
+      if (!log) return { score: 0, completedTasks: 0, totalTasks: 0 };
+      let points = 0;
+      let maxPoints = 0;
+
+      // 1. Schedule blocks execution (40% weight)
+      const blocks = log.schedule_blocks || [];
+      if (blocks.length > 0) {
+        const comp = blocks.filter(b => b.completed).length;
+        points += (comp / blocks.length) * 40;
+      } else {
+        points += 20;
+      }
+      maxPoints += 40;
+
+      // 2. Checklist tasks execution (30% weight)
+      const tasks = [...(log.academic_tasks || []), ...(log.startup_tasks || [])];
+      const totalTasks = tasks.length;
+      const completedTasks = tasks.filter(t => t.completed).length;
+      if (totalTasks > 0) {
+        points += (completedTasks / totalTasks) * 30;
+      } else {
+        points += 30;
+      }
+      maxPoints += 30;
+
+      // 3. Habit vitals & Deep work (30% weight)
+      let habitPoints = 0;
+      if (log.workout_completed) habitPoints += 10;
+      if ((log.study_hours || 0) >= (state.db.settings.targetStudyHours || 4)) habitPoints += 7;
+      else if ((log.study_hours || 0) > 0) habitPoints += 4;
+      if ((log.startup_hours || 0) >= (state.db.settings.targetStartupHours || 3)) habitPoints += 7;
+      else if ((log.startup_hours || 0) > 0) habitPoints += 4;
+      if ((log.dsa_solved || 0) >= (state.db.settings.targetDsaCount || 2)) habitPoints += 6;
+      else if ((log.dsa_solved || 0) > 0) habitPoints += 3;
+      points += habitPoints;
+      maxPoints += 30;
+
+      const score = Math.min(100, Math.round((points / maxPoints) * 100));
+      return { score, completedTasks, totalTasks };
+    }
+
+    // =========================================================================
+    // EXPORT & IMPORT BACKUP SYSTEM
+    // =========================================================================
+    function exportJSONBackup() {
+      try {
+        const dataStr = JSON.stringify(state.db, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const nowStr = formatISO(new Date());
+        const filename = `tracker-backup-${nowStr}.json`;
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast(`Exported ${filename}`);
+      } catch (err) {
+        console.error('Export failed:', err);
+        showToast('Export failed. Check console.', 'error');
+      }
+    }
+
+    function handleImportFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!imported || typeof imported !== 'object' || !imported.dailyLogs) {
+            throw new Error('Invalid JSON tracker structure: missing dailyLogs.');
+          }
+
+          state.db = {
+            version: imported.version || 1,
+            exportedAt: imported.exportedAt || new Date().toISOString(),
+            settings: {
+              ...generateSeedDatabase().settings,
+              ...(imported.settings || {}),
+            },
+            dailyLogs: imported.dailyLogs || {},
+          };
+
+          saveDatabase();
+          renderApp();
+          showToast(`Backup restored! ${Object.keys(state.db.dailyLogs).length} daily logs loaded.`);
+        } catch (err) {
+          console.error('Import error:', err);
+          alert('Failed to import JSON file. Please ensure it is a valid Academic Tracker backup.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // =========================================================================
+    // RENDER: TODAY VIEW
+    // =========================================================================
+    function renderTodayView() {
+      const log = getOrInitLog(state.currentDate);
+      const isToday = state.currentDate === getTodayISO();
+      const isSat = getDayOfWeek(state.currentDate) === 6;
+      const { score } = calculateDailyScore(log);
+
+      const blocks = log.schedule_blocks || [];
+      const completedBlocks = blocks.filter(b => b.completed).length;
+      const blockPct = blocks.length > 0 ? Math.round((completedBlocks / blocks.length) * 100) : 0;
+
+      // Day Type Badge
+      const dayOfWeekNum = getDayOfWeek(state.currentDate);
+      const dayBadge = isSat
+        ? (log.saturday_college_mode ? 'Saturday (Regular College 9-5)' : 'Saturday (Weekend Schedule)')
+        : dayOfWeekNum === 0
+          ? 'Sunday (Deep Revision - No Gym)'
+          : 'Weekday Schedule (Mon–Fri)';
+
+      return `
+        <div class="space-y-6 max-w-4xl mx-auto pb-16">
+          
+          <!-- Date Banner Card -->
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-lg sm:text-xl font-bold text-zinc-100">
+                    ${formatDisplayDate(state.currentDate)}
+                  </h2>
+                  ${isToday ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">TODAY</span>' : ''}
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
+                    ${dayBadge}
+                  </span>
+                  <span class="text-xs text-zinc-500">•</span>
+                  <span class="text-xs text-zinc-400 font-mono">Score: <strong class="${score >= 80 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-zinc-300'}">${score}%</strong></span>
+                </div>
+              </div>
+
+              <!-- View Sub-tabs Switcher -->
+              <div class="flex items-center gap-1.5 bg-zinc-950 p-1 rounded-xl border border-zinc-800 self-start sm:self-auto">
+                <button
+                  onclick="setTodaySubTab('routine')"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${state.todaySubTab === 'routine'
+          ? 'bg-zinc-800 text-zinc-100 shadow border border-zinc-700'
+          : 'text-zinc-400 hover:text-zinc-200'
+        }"
+                >
+                  <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
+                  Daily Routine
+                </button>
+                <button
+                  onclick="setTodaySubTab('pillars')"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${state.todaySubTab === 'pillars'
+          ? 'bg-zinc-800 text-zinc-100 shadow border border-zinc-700'
+          : 'text-zinc-400 hover:text-zinc-200'
+        }"
+                >
+                  <i data-lucide="target" class="w-3.5 h-3.5 text-violet-400"></i>
+                  Pillars &amp; Vitals
+                </button>
+              </div>
+            </div>
+
+            <!-- Block Execution Progress Bar -->
+            <div class="pt-3 border-t border-zinc-800/80">
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <span class="text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i>
+                  Block Execution
+                </span>
+                <span class="font-mono text-zinc-200 font-semibold">
+                  ${completedBlocks} of ${blocks.length} Blocks (${blockPct}%)
+                </span>
+              </div>
+              <div class="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-850">
+                <div
+                  class="h-full rounded-full transition-all duration-300 ${blockPct === 100 ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50' : blockPct >= 50 ? 'bg-emerald-500' : 'bg-zinc-600'
+        }"
+                  style="width: ${blockPct}%"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sleep Tracker Widget -->
+          ${renderSleepWidget(log)}
+
+          <!-- View Sub-tabs Content -->
+          ${state.todaySubTab === 'routine' ? renderRoutineBlocks(log) : renderPillarsAndVitals(log)}
+
+          <!-- Collapsible Monthly Analytics Section -->
+          ${renderCollapsibleMonthlyAnalytics()}
+
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SUB-COMPONENTS: SLEEP WIDGET
+    // =========================================================================
+    function renderSleepWidget(log) {
+      const hours = (log.sleep_hours !== undefined && log.sleep_hours !== null) ? log.sleep_hours : 7.0;
+      let label = 'Good Rest 👍';
+      let pillClass = 'text-sky-400 bg-sky-500/10 border-sky-500/30';
+      if (hours >= 7.5) {
+        label = 'Optimal Recovery ⚡';
+        pillClass = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+      } else if (hours < 6.0) {
+        label = 'Sleep Deficit 😴';
+        pillClass = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
+      }
+
+      return `
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 sm:p-5 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0 shadow-sm shadow-indigo-500/10">
+                <i data-lucide="moon" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <h3 class="font-bold text-zinc-100 text-base sm:text-lg tracking-tight">
+                    Sleep Last Night (hours)
+                  </h3>
+                  <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${pillClass}">${label}</span>
+                </div>
+                <p class="text-xs text-zinc-400 mt-0.5">Recovery baseline &amp; cognitive energy index</p>
+              </div>
+            </div>
+
+            <!-- Controls: Clean numeric display with quick step buttons (- / + 0.5 hrs) -->
+            <div class="flex items-center gap-3 self-end sm:self-auto">
+              <div class="flex items-center bg-zinc-950 border border-zinc-800 rounded-2xl p-1.5 shadow-inner">
+                <button
+                  type="button"
+                  onclick="adjustSleep(-0.5)"
+                  class="w-9 h-9 rounded-xl bg-zinc-900 hover:bg-zinc-800 active:scale-90 text-zinc-300 hover:text-zinc-100 flex items-center justify-center transition border border-zinc-800 hover:border-zinc-700 font-bold"
+                  title="Subtract 0.5 hrs"
+                  aria-label="Subtract 0.5 hours"
+                >
+                  <i data-lucide="minus" class="w-4 h-4"></i>
+                </button>
+                <div class="px-3 sm:px-4 min-w-[85px] sm:min-w-[95px] text-center select-none">
+                  <span class="font-mono text-xl sm:text-2xl font-extrabold text-zinc-100 block leading-tight tracking-tight">${hours.toFixed(1)}</span>
+                  <span class="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">HOURS</span>
+                </div>
+                <button
+                  type="button"
+                  onclick="adjustSleep(0.5)"
+                  class="w-9 h-9 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 active:scale-90 text-indigo-300 hover:text-indigo-200 border border-indigo-500/35 flex items-center justify-center transition font-bold"
+                  title="Add 0.5 hrs"
+                  aria-label="Add 0.5 hours"
+                >
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Preset chips -->
+              <div class="hidden md:flex items-center gap-1.5 font-mono text-xs">
+                ${[6.0, 7.0, 7.5, 8.0, 8.5].map(h => `
+                  <button
+                    type="button"
+                    onclick="setSleep(${h})"
+                    class="px-2.5 py-1.5 rounded-xl border transition active:scale-95 ${Math.abs(hours - h) < 0.1
+          ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300 font-bold shadow-sm'
+          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+        }"
+                  >
+                    ${h.toFixed(1)}h
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Slider bar -->
+          <div class="pt-2.5 border-t border-zinc-800/60 flex items-center gap-3">
+            <span class="text-[11px] font-mono text-zinc-500">3.0h</span>
+            <input
+              type="range"
+              min="3"
+              max="12"
+              step="0.5"
+              value="${hours}"
+              oninput="setSleep(parseFloat(this.value))"
+              class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-400"
+            />
+            <span class="text-[11px] font-mono text-zinc-500">12.0h</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSaturdayToggle(log) {
+      const isCollege = !!log.saturday_college_mode;
+      return `
+        <div class="p-4 sm:p-5 rounded-2xl bg-zinc-900/90 border ${isCollege ? 'border-emerald-500/40 shadow-sm shadow-emerald-500/10' : 'border-zinc-800'
+        } shadow-sm flex items-center justify-between gap-4 transition-all">
+          <div class="flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl ${isCollege
+          ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+          : 'bg-zinc-800/80 border-zinc-700/80 text-zinc-400'
+        } border flex items-center justify-center shrink-0">
+              <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="text-sm sm:text-base font-bold text-zinc-100">Regular College Today (9-5)</h4>
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${isCollege
+          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+        }">
+                  ${isCollege ? 'ON' : 'OFF'}
+                </span>
+              </div>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                ${isCollege
+          ? 'Switched to Weekday template (Gym + 6 College Lectures + Academic evening).'
+          : 'Default weekend template (Gym + 2 Revision Blocks + Startup Sprint).'}
+              </p>
+            </div>
+          </div>
+
+          <!-- Modern sliding toggle switch -->
+          <button
+            type="button"
+            role="switch"
+            aria-checked="${isCollege ? 'true' : 'false'}"
+            onclick="toggleSaturdayCollegeMode()"
+            class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none shrink-0 ${isCollege ? 'bg-emerald-500' : 'bg-zinc-800 hover:bg-zinc-750'
+        }"
+            title="Toggle Regular College Today (9-5)"
+          >
+            <span
+              class="pointer-events-none inline-block h-6 w-6 transform rounded-full shadow-md ring-0 transition duration-200 ease-in-out ${isCollege ? 'translate-x-5 bg-zinc-950' : 'translate-x-0 bg-zinc-300'
+        }"
+            ></span>
+          </button>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SUB-COMPONENTS: ROUTINE TIME BLOCKS
+    // =========================================================================
+    function renderRoutineBlocks(log) {
+      const blocks = log.schedule_blocks || [];
+      const isSat = getDayOfWeek(state.currentDate) === 6;
+      const completedBlocks = blocks.filter(b => b.completed).length;
+
+      const categoryStyles = {
+        gym: {
+          icon: 'dumbbell',
+          border: 'border-emerald-500/20 hover:border-emerald-500/40',
+          badge: 'Gym',
+          chip: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+        },
+        college: {
+          icon: 'graduation-cap',
+          border: 'border-emerald-500/20 hover:border-emerald-500/40',
+          badge: 'College Lectures',
+          chip: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+        },
+        rest: {
+          icon: 'coffee',
+          border: 'border-amber-500/20 hover:border-amber-500/40',
+          badge: 'Rest & Reset',
+          chip: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+        },
+        academic: {
+          icon: 'book-open',
+          border: 'border-emerald-500/20 hover:border-emerald-500/40',
+          badge: 'Academic Work',
+          chip: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+        },
+        dinner: {
+          icon: 'utensils',
+          border: 'border-amber-500/20 hover:border-amber-500/40',
+          badge: 'Dinner & Chill',
+          chip: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+        },
+        startup: {
+          icon: 'rocket',
+          border: 'border-violet-500/20 hover:border-violet-500/40',
+          badge: 'Startup Sprint',
+          chip: 'text-violet-400 bg-violet-500/10 border-violet-500/20',
+        },
+        revision: {
+          icon: 'book-open',
+          border: 'border-sky-500/20 hover:border-sky-500/40',
+          badge: 'Revision Block',
+          chip: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+        },
+      };
+
+      return `
+        <div class="space-y-4">
+          <!-- Saturday College Mode Switch (at the top on Saturdays) -->
+          ${isSat ? renderSaturdayToggle(log) : ''}
+
+          <!-- Header summary row -->
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center gap-2">
+              <div class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-zinc-300">
+                  Daily Schedule Blocks (${blocks.length})
+                </h3>
+                <p class="text-[11px] text-zinc-500 font-mono">
+                  All changes auto-save instantly to localStorage
+                </p>
+              </div>
+            </div>
+            <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-xl">
+              ${completedBlocks} of ${blocks.length} Completed
+            </span>
+          </div>
+
+          <!-- Schedule Blocks Cards List -->
+          <div class="space-y-3">
+            ${blocks.map(block => {
+        const style = categoryStyles[block.category] || categoryStyles.academic;
+        const isCollege = block.category === 'college';
+        const lectures = block.lectureStatus || [false, false, false, false, false, false];
+        const attendedCount = block.lecturesAttended ?? lectures.filter(Boolean).length;
+        const hasTextarea = !!block.hasTextarea;
+
+        return `
+                <div class="group rounded-2xl border ${style.border} bg-zinc-900/60 p-4 sm:p-5 transition-all shadow-sm ${block.completed ? 'bg-zinc-900/35 border-zinc-800/80' : ''}">
+                  <div class="flex items-start justify-between gap-3 sm:gap-4">
+                    
+                    <!-- Left: Checkbox & Info -->
+                    <div class="flex items-start gap-3.5 flex-1 min-w-0">
+                      <button
+                        type="button"
+                        onclick="toggleScheduleBlock('${block.id}')"
+                        class="mt-0.5 shrink-0 w-7 h-7 rounded-xl border flex items-center justify-center transition-all ${block.completed
+            ? 'bg-emerald-500 border-emerald-400 text-zinc-950 font-bold shadow-md shadow-emerald-500/20'
+            : 'border-zinc-700 bg-zinc-950/90 text-transparent hover:border-zinc-500 hover:scale-105'
+          }"
+                        title="${block.completed ? 'Mark pending' : 'Mark completed'}"
+                        aria-label="Toggle ${block.title} completion"
+                      >
+                        <i data-lucide="check" class="w-4 h-4 stroke-[3] ${block.completed ? 'block text-zinc-950' : 'opacity-0'}"></i>
+                      </button>
+
+                      <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <h4 class="font-bold text-sm sm:text-base ${block.completed ? 'line-through text-zinc-400' : 'text-zinc-100'}">
+                            ${escapeHtml(block.title)}
+                          </h4>
+                          <span class="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full border ${style.chip}">
+                            <i data-lucide="clock" class="w-3 h-3"></i>
+                            ${escapeHtml(block.timeSlot)}
+                          </span>
+                          <span class="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 px-2 py-0.5 rounded bg-zinc-950 border border-zinc-800">
+                            ${style.badge}
+                          </span>
+                        </div>
+
+                        <!-- 6-Lecture Attendance Check-Chips if College -->
+                        ${isCollege ? `
+                          <div class="mt-3.5 p-3.5 rounded-xl bg-zinc-950/90 border border-zinc-800 space-y-2.5">
+                            <div class="flex items-center justify-between text-xs">
+                              <span class="font-semibold text-zinc-300 flex items-center gap-1.5">
+                                <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-400"></i>
+                                College Lectures (6 Slots)
+                              </span>
+                              <span class="font-mono font-bold px-2.5 py-0.5 rounded-full text-[11px] ${attendedCount === 6
+              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+              : attendedCount > 0
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                : 'bg-zinc-850 text-zinc-400 border border-zinc-750'
+            }">
+                                ${attendedCount} of 6 Attended
+                              </span>
+                            </div>
+
+                            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1">
+                              ${lectures.map((isAtt, idx) => `
+                                <button
+                                  type="button"
+                                  onclick="toggleBlockLecture('${block.id}', ${idx})"
+                                  class="flex items-center justify-center gap-2 py-2 px-2 rounded-xl border text-xs font-mono font-bold transition-all select-none active:scale-95 ${isAtt
+                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 shadow-sm shadow-emerald-500/10 ring-1 ring-emerald-500/30'
+                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
+              }"
+                                  title="Lecture ${idx + 1}: ${isAtt ? 'Attended (click to toggle)' : 'Not attended (click to toggle)'}"
+                                >
+                                  <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${isAtt ? 'bg-emerald-400 text-zinc-950 font-extrabold' : 'bg-zinc-800 text-zinc-400'
+              }">
+                                    ${isAtt ? '✓' : idx + 1}
+                                  </span>
+                                  <span>Lec ${idx + 1}</span>
+                                </button>
+                              `).join('')}
+                            </div>
+                          </div>
+                        ` : ''}
+
+                        <!-- Textarea for topics, assignments, notes, or tasks done -->
+                        ${hasTextarea ? `
+                          <div class="mt-3.5 pt-3 border-t border-zinc-800/60">
+                            <label class="block text-[11px] font-semibold text-zinc-400 mb-1.5 flex items-center justify-between">
+                              <span class="flex items-center gap-1.5">
+                                <i data-lucide="edit-3" class="w-3 h-3 text-zinc-500"></i>
+                                ${block.category === 'startup'
+              ? 'Tasks done / deliverables:'
+              : 'Topics, assignments, notes:'
+            }
+                              </span>
+                              <span class="text-[10px] text-zinc-500 font-mono">Auto-saves instantly</span>
+                            </label>
+                            <textarea
+                              rows="2"
+                              oninput="updateBlockNotes('${block.id}', this.value)"
+                              placeholder="${escapeHtml(block.textareaPlaceholder || 'Enter notes...')}"
+                              class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition resize-y font-sans leading-relaxed"
+                            >${escapeHtml(block.notes || '')}</textarea>
+                          </div>
+                        ` : ''}
+
+                      </div>
+                    </div>
+
+                    <!-- Right Category Icon -->
+                    <div class="hidden sm:flex p-2.5 rounded-xl border shrink-0 ${style.chip}">
+                      <i data-lucide="${style.icon}" class="w-5 h-5"></i>
+                    </div>
+
+                  </div>
+                </div>
+              `;
+      }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SUB-COMPONENTS: PILLARS & HABIT VITALS
+    // =========================================================================
+    function renderPillarsAndVitals(log) {
+      return `
+        <div class="space-y-6">
+          
+          <!-- Summary Metric Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span class="text-xs text-zinc-400 block">DSA Solved</span>
+              <span class="text-xl sm:text-2xl font-bold font-mono text-sky-400">${log.dsa_solved || 0}</span>
+              <span class="text-[10px] text-zinc-500 block">Target: ${state.db.settings.targetDsaCount || 2}</span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span class="text-xs text-zinc-400 block">Academic Hours</span>
+              <span class="text-xl sm:text-2xl font-bold font-mono text-emerald-400">${log.study_hours || 0}h</span>
+              <span class="text-[10px] text-zinc-500 block">Target: ${state.db.settings.targetStudyHours || 4}h</span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span class="text-xs text-zinc-400 block">Startup Hours</span>
+              <span class="text-xl sm:text-2xl font-bold font-mono text-violet-400">${log.startup_hours || 0}h</span>
+              <span class="text-[10px] text-zinc-500 block">Target: ${state.db.settings.targetStartupHours || 3}h</span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span class="text-xs text-zinc-400 block">Workout</span>
+              <span class="text-xl sm:text-2xl font-bold font-mono ${log.workout_completed ? 'text-emerald-400' : 'text-zinc-500'}">
+                ${log.workout_completed ? 'Done ✓' : 'Pending'}
+              </span>
+              <span class="text-[10px] text-zinc-500 block">Daily fitness</span>
+            </div>
+          </div>
+
+          <!-- Two Column Grid for Task Pillars -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            
+            <!-- Left: Academic Pillar & Lectures -->
+            <div class="space-y-6">
+              ${renderTaskListCard(
+        'Academic & College Tasks',
+        'Assignments, exams & conceptual mastery',
+        'academic',
+        'book-open',
+        log.academic_tasks || [],
+        'emerald'
+      )}
+
+              ${renderLectureTrackerCard(log)}
+            </div>
+
+            <!-- Right: Startup Sprint & Habit Vitals -->
+            <div class="space-y-6">
+              ${renderTaskListCard(
+        'Startup & Engineering',
+        'Product sprint, features & user discovery',
+        'startup',
+        'rocket',
+        log.startup_tasks || [],
+        'violet'
+      )}
+
+              ${renderHabitVitalsCard(log)}
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function renderTaskListCard(title, subtitle, category, icon, tasks, accent) {
+      const compCount = tasks.filter(t => t.completed).length;
+      const isEmerald = accent === 'emerald';
+
+      return `
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+            <div class="flex items-center gap-2.5">
+              <div class="p-2 rounded-xl border ${isEmerald ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-violet-500/10 text-violet-400 border-violet-500/20'}">
+                <i data-lucide="${icon}" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-zinc-100 text-sm sm:text-base">${title}</h3>
+                <p class="text-xs text-zinc-400">${subtitle}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full border ${isEmerald ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-violet-500/10 text-violet-400 border-violet-500/20'}">
+                ${compCount}/${tasks.length} Done
+              </span>
+              <button
+                onclick="promptAddTask('${category}')"
+                class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition"
+                title="Add task"
+              >
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Task Items List -->
+          <div class="space-y-2">
+            ${tasks.length === 0 ? `
+              <div class="text-center py-6 text-xs text-zinc-500">
+                No items in this checklist yet. Tap + to add.
+              </div>
+            ` : tasks.map(task => `
+              <div class="flex items-center justify-between p-2.5 rounded-xl border transition ${task.completed ? 'border-zinc-800/60 bg-zinc-900/30' : 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-850'
+        }">
+                <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
+                  <button
+                    onclick="toggleTask('${task.id}', '${category}')"
+                    class="w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 transition ${task.completed
+          ? (isEmerald ? 'bg-emerald-500 border-emerald-400 text-zinc-950 font-bold' : 'bg-violet-500 border-violet-400 text-zinc-100 font-bold')
+          : 'border-zinc-700 bg-zinc-950 hover:border-zinc-500'
+        }"
+                  >
+                    ${task.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>' : ''}
+                  </button>
+                  <span class="text-xs sm:text-sm font-medium ${task.completed ? 'line-through text-zinc-400' : 'text-zinc-200'} truncate">
+                    ${escapeHtml(task.title)}
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  ${task.priority ? `
+                    <span class="text-[10px] font-semibold px-2 py-0.5 rounded capitalize ${task.priority === 'high' ? 'bg-rose-500/15 text-rose-300 border border-rose-500/30' : 'bg-zinc-800 text-zinc-400'
+          }">
+                      ${task.priority}
+                    </span>
+                  ` : ''}
+
+                  ${task.timeEstimate ? `
+                    <span class="text-[10px] font-mono text-zinc-500 hidden sm:inline-block">
+                      ${task.timeEstimate}
+                    </span>
+                  ` : ''}
+
+                  <button
+                    onclick="deleteTask('${task.id}', '${category}')"
+                    class="p-1 rounded text-zinc-500 hover:text-rose-400 transition"
+                    title="Delete"
+                  >
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLectureTrackerCard(log) {
+      const lectures = log.lectures || [];
+      const attendedCount = lectures.filter(l => l.attended).length;
+
+      return `
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+            <div class="flex items-center gap-2.5">
+              <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-zinc-100 text-sm sm:text-base">College Lectures</h3>
+                <p class="text-xs text-zinc-400">Attendance &amp; syllabus topics</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                ${attendedCount} of ${lectures.length} Attended
+              </span>
+              <button
+                onclick="promptAddLecture()"
+                class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition"
+                title="Add Lecture"
+              >
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Lectures list -->
+          <div class="space-y-2">
+            ${lectures.length === 0 ? `
+              <div class="text-center py-6 text-xs text-zinc-500">
+                No lectures logged for this date.
+              </div>
+            ` : lectures.map(lec => `
+              <div class="p-3 rounded-xl border border-zinc-800 bg-zinc-900/50 space-y-2">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <button
+                      onclick="toggleLectureItem('${lec.id}')"
+                      class="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition ${lec.attended
+          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+          : 'bg-zinc-800 text-zinc-500 border border-zinc-700 hover:border-zinc-500'
+        }"
+                      title="${lec.attended ? 'Attended' : 'Mark Attended'}"
+                    >
+                      <i data-lucide="${lec.attended ? 'check-circle-2' : 'x-circle'}" class="w-4 h-4"></i>
+                    </button>
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold text-xs sm:text-sm text-zinc-100 truncate">${escapeHtml(lec.subject_name)}</span>
+                        <span class="text-[10px] font-mono text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">#${lec.lecture_number}</span>
+                      </div>
+                      <span class="text-[11px] text-zinc-500 font-mono">${lec.time_slot || 'Standard Slot'}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onclick="deleteLectureItem('${lec.id}')"
+                    class="text-zinc-500 hover:text-rose-400 p-1"
+                    title="Delete"
+                  >
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+
+                <!-- Topic & Notes inputs -->
+                <div class="pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <input
+                    type="text"
+                    value="${escapeHtml(lec.topic || '')}"
+                    placeholder="Topic covered..."
+                    onchange="updateLectureItem('${lec.id}', 'topic', this.value)"
+                    class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
+                  />
+                  <input
+                    type="text"
+                    value="${escapeHtml(lec.notes || '')}"
+                    placeholder="Key notes / formulas..."
+                    onchange="updateLectureItem('${lec.id}', 'notes', this.value)"
+                    class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHabitVitalsCard(log) {
+      return `
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+            <div class="flex items-center gap-2.5">
+              <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <i data-lucide="activity" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-zinc-100 text-sm sm:text-base">Habits &amp; Daily Vitals</h3>
+                <p class="text-xs text-zinc-400">Workout, DSA, hours and hydration</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            
+            <!-- Workout Toggle -->
+            <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="font-semibold text-zinc-300">Workout</span>
+                <i data-lucide="dumbbell" class="w-4 h-4 text-emerald-400"></i>
+              </div>
+              <button
+                onclick="toggleWorkout()"
+                class="mt-2 py-1.5 px-3 rounded-lg font-bold border transition text-center ${log.workout_completed
+          ? 'bg-emerald-500 text-zinc-950 border-emerald-400'
+          : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700'
+        }"
+              >
+                ${log.workout_completed ? 'Completed ✓' : 'Mark Done'}
+              </button>
+            </div>
+
+            <!-- DSA Solved +/- -->
+            <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="font-semibold text-zinc-300">DSA Count</span>
+                <i data-lucide="code-2" class="w-4 h-4 text-sky-400"></i>
+              </div>
+              <div class="flex items-center justify-between mt-2">
+                <button onclick="adjustDsa(-1)" class="w-7 h-7 rounded bg-zinc-900 border border-zinc-800 text-zinc-200 font-bold">-</button>
+                <span class="font-mono font-bold text-sm text-zinc-100">${log.dsa_solved || 0}</span>
+                <button onclick="adjustDsa(1)" class="w-7 h-7 rounded bg-sky-500/20 border border-sky-500/30 text-sky-300 font-bold">+</button>
+              </div>
+            </div>
+
+            <!-- Academic Hours +/- -->
+            <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="font-semibold text-zinc-300">Study Hours</span>
+                <i data-lucide="clock" class="w-4 h-4 text-emerald-400"></i>
+              </div>
+              <div class="flex items-center justify-between mt-2">
+                <button onclick="adjustStudyHours(-0.5)" class="w-7 h-7 rounded bg-zinc-900 border border-zinc-800 text-zinc-200 font-bold">-</button>
+                <span class="font-mono font-bold text-sm text-zinc-100">${(log.study_hours || 0).toFixed(1)}h</span>
+                <button onclick="adjustStudyHours(0.5)" class="w-7 h-7 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold">+</button>
+              </div>
+            </div>
+
+            <!-- Startup Hours +/- -->
+            <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="font-semibold text-zinc-300">Startup Hours</span>
+                <i data-lucide="rocket" class="w-4 h-4 text-violet-400"></i>
+              </div>
+              <div class="flex items-center justify-between mt-2">
+                <button onclick="adjustStartupHours(-0.5)" class="w-7 h-7 rounded bg-zinc-900 border border-zinc-800 text-zinc-200 font-bold">-</button>
+                <span class="font-mono font-bold text-sm text-zinc-100">${(log.startup_hours || 0).toFixed(1)}h</span>
+                <button onclick="adjustStartupHours(0.5)" class="w-7 h-7 rounded bg-violet-500/20 border border-violet-500/30 text-violet-300 font-bold">+</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Hydration & Mood -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <!-- Hydration -->
+            <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="droplets" class="w-4 h-4 text-sky-400"></i>
+                <span class="text-xs text-zinc-300">Water: <strong>${(log.water_liters || 0).toFixed(1)}L</strong></span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button onclick="adjustWater(-0.25)" class="px-2 py-1 text-[11px] rounded bg-zinc-900 text-zinc-400">-0.25</button>
+                <button onclick="adjustWater(0.5)" class="px-2 py-1 text-[11px] rounded bg-sky-500/20 text-sky-300 font-semibold border border-sky-500/30">+0.5L</button>
+              </div>
+            </div>
+
+            <!-- Mood -->
+            <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between">
+              <span class="text-xs text-zinc-300">Mood:</span>
+              <div class="flex items-center gap-1">
+                ${['tired', 'neutral', 'good', 'great'].map(m => `
+                  <button
+                    onclick="setMood('${m}')"
+                    class="px-2 py-0.5 text-[10px] rounded font-semibold capitalize border transition ${log.mood === m
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+            : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:text-zinc-300'
+          }"
+                  >
+                    ${m}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Highlight -->
+          <div class="pt-2">
+            <label class="text-xs font-semibold text-zinc-400 block mb-1.5 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+              Daily Highlight / High-Leverage Win
+            </label>
+            <input
+              type="text"
+              value="${escapeHtml(log.daily_highlight || '')}"
+              onchange="updateDailyHighlight(this.value)"
+              placeholder="What made today a high-leverage day?"
+              class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500 transition"
+            />
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // RENDER: WEEKLY VIEW
+    // =========================================================================
+    function renderWeeklyView() {
+      const current = parseISODate(state.currentDate);
+      const day = current.getDay();
+      // Start week on Monday (1)
+      const diffToMon = current.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(current.setDate(diffToMon));
+
+      const weekDates = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        weekDates.push(formatISO(d));
+      }
+
+      // Calculate weekly metrics
+      let totalScore = 0;
+      let totalDeepHours = 0;
+      let totalStudyHours = 0;
+      let totalStartupHours = 0;
+      let totalDsa = 0;
+      let totalLecAttended = 0;
+      let totalLecScheduled = 0;
+
+      weekDates.forEach(dStr => {
+        const log = state.db.dailyLogs[dStr];
+        if (log) {
+          const { score } = calculateDailyScore(log);
+          totalScore += score;
+          totalStudyHours += (log.study_hours || 0);
+          totalStartupHours += (log.startup_hours || 0);
+          totalDeepHours += (log.study_hours || 0) + (log.startup_hours || 0);
+          totalDsa += (log.dsa_solved || 0);
+
+          const lecs = log.lectures || [];
+          totalLecScheduled += lecs.length;
+          totalLecAttended += lecs.filter(l => l.attended).length;
+        }
+      });
+
+      const avgScore = Math.round(totalScore / 7);
+
+      return `
+        <div class="space-y-6 max-w-7xl mx-auto pb-16">
+          
+          <!-- Top Week Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800">
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-zinc-100 flex items-center gap-2">
+                Weekly Execution Matrix
+              </h2>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                ${formatDisplayDate(weekDates[0])} — ${formatDisplayDate(weekDates[6])}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="shiftWeek(-7)" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-zinc-100 transition">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <button onclick="goToCurrentWeek()" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-zinc-100 transition">
+                Current Week
+              </button>
+              <button onclick="shiftWeek(7)" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-zinc-100 transition">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Weekly Metrics Banner -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+            <div>
+              <span class="text-xs text-zinc-400 font-semibold block">Week Avg Score</span>
+              <span class="text-2xl font-bold font-mono text-zinc-100">${avgScore}%</span>
+              <span class="text-[11px] text-emerald-400 block mt-0.5">${avgScore >= 75 ? 'Optimal Cadence' : 'Standard Routine'}</span>
+            </div>
+
+            <div>
+              <span class="text-xs text-zinc-400 font-semibold block">Total Deep Work</span>
+              <span class="text-2xl font-bold font-mono text-violet-400">${totalDeepHours.toFixed(1)}h</span>
+              <span class="text-[11px] text-zinc-500 block mt-0.5">${totalStudyHours}h Academics • ${totalStartupHours}h Startup</span>
+            </div>
+
+            <div>
+              <span class="text-xs text-zinc-400 font-semibold block">College Lectures</span>
+              <span class="text-2xl font-bold font-mono text-emerald-400">${totalLecAttended}/${totalLecScheduled}</span>
+              <span class="text-[11px] text-zinc-500 block mt-0.5">${totalLecScheduled > 0 ? Math.round((totalLecAttended / totalLecScheduled) * 100) : 0}% Attendance</span>
+            </div>
+
+            <div>
+              <span class="text-xs text-zinc-400 font-semibold block">DSA Momentum</span>
+              <span class="text-2xl font-bold font-mono text-sky-400">${totalDsa} prob</span>
+              <span class="text-[11px] text-zinc-500 block mt-0.5">Problems solved</span>
+            </div>
+          </div>
+
+          <!-- 7-Day Timeline Cards -->
+          <div class="space-y-3">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-zinc-400">Day-by-Day Performance</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
+              ${weekDates.map(dateStr => {
+        const log = state.db.dailyLogs[dateStr];
+        const { score, completedTasks, totalTasks } = calculateDailyScore(log);
+        const isSelected = state.currentDate === dateStr;
+        const isToday = dateStr === getTodayISO();
+
+        const d = parseISODate(dateStr);
+        const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+        const dayNum = d.getDate();
+
+        const lecAtt = (log?.lectures || []).filter(l => l.attended).length;
+        const lecTot = (log?.lectures || []).length;
+
+        return `
+                  <div
+                    onclick="selectDateAndOpen('${dateStr}')"
+                    class="rounded-2xl border p-4 cursor-pointer transition-all flex flex-col justify-between select-none ${isSelected
+            ? 'border-emerald-500 bg-zinc-900 shadow-lg shadow-emerald-500/10 ring-1 ring-emerald-500/40'
+            : 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-850 hover:border-zinc-700'
+          }"
+                  >
+                    <div>
+                      <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                        <div>
+                          <span class="text-xs font-bold text-zinc-400 uppercase">${dayName}</span>
+                          <p class="text-lg font-mono font-bold text-zinc-100">${dayNum}</p>
+                        </div>
+                        ${isToday ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/30">Today</span>' : ''}
+                      </div>
+
+                      <div class="my-3">
+                        <div class="flex items-center justify-between text-xs font-mono mb-1">
+                          <span class="text-zinc-500">Score</span>
+                          <span class="font-bold ${score >= 80 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-zinc-400'}">${score}%</span>
+                        </div>
+                        <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                          <div class="h-full rounded-full ${score >= 80 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-500' : 'bg-zinc-600'}" style="width: ${score}%"></div>
+                        </div>
+                      </div>
+
+                      <div class="space-y-1.5 text-xs text-zinc-400">
+                        <div class="flex items-center justify-between">
+                          <span>Lectures</span>
+                          <span class="font-mono text-zinc-200">${lecAtt}/${lecTot}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                          <span>Startup</span>
+                          <span class="font-mono text-zinc-200">${log?.startup_hours || 0}h</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                          <span>DSA</span>
+                          <span class="font-mono text-zinc-200">${log?.dsa_solved || 0}</span>
+                        </div>
+                        <div class="flex items-center justify-between pt-1 border-t border-zinc-800 text-[11px]">
+                          <span class="text-zinc-500">Tasks</span>
+                          <span class="font-mono text-zinc-400">${completedTasks}/${totalTasks}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-3 pt-2 border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-500 hover:text-zinc-300">
+                      <span>Open Day</span>
+                      <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </div>
+                  </div>
+                `;
+      }).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // RENDER: MONTHLY ANALYTICS ENGINE, METRICS & HEATMAP
+    // =========================================================================
+    function calculateMonthlyStats(year, month) {
+      const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const todayStr = getTodayISO();
+
+      let sleepSum = 0;
+      let sleepCount = 0;
+      let totalAcademicHours = 0;
+      let startupSprintsCount = 0;
+      let potentialLectures = 0;
+      let attendedLectures = 0;
+      let activeDaysCount = 0;
+      const completionRates = {};
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dStr = `${monthPrefix}-${String(day).padStart(2, '0')}`;
+        const log = state.db.dailyLogs[dStr];
+        const dayOfWeek = getDayOfWeek(dStr);
+        const isCollegeDay = (dayOfWeek >= 1 && dayOfWeek <= 5) || (dayOfWeek === 6 && log?.saturday_college_mode);
+
+        if (log) {
+          // 1. Average Sleep Hours
+          if (typeof log.sleep_hours === 'number' && log.sleep_hours > 0) {
+            sleepSum += log.sleep_hours;
+            sleepCount++;
+          }
+
+          // 2. Total Academic & Revision Hours logged
+          let dayAcadHours = log.study_hours || 0;
+          const blocks = log.schedule_blocks || [];
+          const completedAcadBlocks = blocks.filter(b => (b.category === 'academic' || b.category === 'revision') && b.completed);
+          if (dayAcadHours === 0 && completedAcadBlocks.length > 0) {
+            dayAcadHours = completedAcadBlocks.length * 2;
+          }
+          totalAcademicHours += dayAcadHours;
+
+          // 3. Startup sprints completed (count)
+          const startupCompleted = blocks.some(b => b.category === 'startup' && b.completed);
+          if (startupCompleted) {
+            startupSprintsCount++;
+          }
+
+          // 4. Lecture attendance on college days
+          if (isCollegeDay && (dStr <= todayStr || log.schedule_blocks?.length > 0)) {
+            const collegeBlock = blocks.find(b => b.category === 'college');
+            const lecAtt = collegeBlock ? (collegeBlock.lecturesAttended ?? (collegeBlock.lectureStatus ? collegeBlock.lectureStatus.filter(Boolean).length : 0)) : (log.lectures ? log.lectures.filter(l => l.attended).length : 0);
+            const lecPot = collegeBlock ? (collegeBlock.totalLectures || 6) : 6;
+            potentialLectures += lecPot;
+            attendedLectures += lecAtt;
+          }
+
+          // Completion rate for heatmap
+          if (blocks.length > 0) {
+            const comp = blocks.filter(b => b.completed).length;
+            const rate = Math.round((comp / blocks.length) * 100);
+            completionRates[dStr] = rate;
+            if (rate >= 25) activeDaysCount++;
+          } else {
+            completionRates[dStr] = 0;
+          }
+        } else {
+          if (isCollegeDay && dStr <= todayStr) {
+            potentialLectures += 6;
+          }
+          completionRates[dStr] = 0;
+        }
+      }
+
+      const avgSleep = sleepCount > 0 ? (sleepSum / sleepCount).toFixed(1) : '7.0';
+      const lectureAttendanceRate = potentialLectures > 0 ? Math.round((attendedLectures / potentialLectures) * 100) : 0;
+
+      return {
+        year,
+        month,
+        daysInMonth,
+        monthPrefix,
+        avgSleep,
+        sleepCount,
+        totalAcademicHours: Number(totalAcademicHours.toFixed(1)),
+        startupSprintsCount,
+        attendedLectures,
+        potentialLectures,
+        lectureAttendanceRate,
+        activeDaysCount,
+        completionRates,
+      };
+    }
+
+    function renderMonthlyMetricCards(stats) {
+      return `
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <!-- 1. Average Sleep Hours -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 shadow-sm flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-zinc-400">Average Sleep Hours</span>
+              <div class="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                <i data-lucide="moon" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div>
+              <span class="text-2xl sm:text-3xl font-extrabold font-mono text-indigo-300 block leading-tight">
+                ${stats.avgSleep} <span class="text-sm font-sans font-semibold text-zinc-400">hrs</span>
+              </span>
+              <span class="text-[11px] text-zinc-500 block mt-1">Across ${stats.sleepCount} logged days</span>
+            </div>
+          </div>
+
+          <!-- 2. Total Academic & Revision Hours -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 shadow-sm flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-zinc-400">Academic &amp; Revision</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div>
+              <span class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400 block leading-tight">
+                ${stats.totalAcademicHours} <span class="text-sm font-sans font-semibold text-zinc-400">hrs</span>
+              </span>
+              <span class="text-[11px] text-zinc-500 block mt-1">Total study &amp; revision logged</span>
+            </div>
+          </div>
+
+          <!-- 3. Startup Sprints Completed -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 shadow-sm flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-zinc-400">Startup Sprints Completed</span>
+              <div class="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/20 text-violet-400 flex items-center justify-center shrink-0">
+                <i data-lucide="rocket" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div>
+              <span class="text-2xl sm:text-3xl font-extrabold font-mono text-violet-300 block leading-tight">
+                ${stats.startupSprintsCount} <span class="text-sm font-sans font-semibold text-zinc-400">sprints</span>
+              </span>
+              <span class="text-[11px] text-zinc-500 block mt-1">Completed deep work sprints</span>
+            </div>
+          </div>
+
+          <!-- 4. Lecture Attendance Percentage -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 shadow-sm flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-zinc-400">Lecture Attendance</span>
+              <div class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div>
+              <span class="text-2xl sm:text-3xl font-extrabold font-mono text-sky-400 block leading-tight">
+                ${stats.lectureAttendanceRate}%
+              </span>
+              <span class="text-[11px] text-zinc-500 block mt-1">
+                ${stats.attendedLectures} / ${stats.potentialLectures} potential lectures
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHeatmapCard(stats) {
+      return `
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 sm:p-5 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
+            <div class="flex items-center gap-2.5">
+              <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <i data-lucide="flame" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-sm sm:text-base font-bold text-zinc-100">Monthly Completion Heatmap</h3>
+                <p class="text-xs text-zinc-400">Click any date to switch and edit its schedule blocks</p>
+              </div>
+            </div>
+
+            <!-- Exact thresholds requested:
+                 0-25%: zinc-800
+                 25-50%: emerald-950
+                 50-75%: emerald-700
+                 75-100%: emerald-500 -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="text-zinc-500 font-medium text-[11px]">Completion Rate:</span>
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300 text-[11px] font-mono">
+                <span class="w-2.5 h-2.5 rounded bg-zinc-800 border border-zinc-600"></span> 0-25%
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-900 text-emerald-300 text-[11px] font-mono">
+                <span class="w-2.5 h-2.5 rounded bg-emerald-950 border border-emerald-800"></span> 25-50%
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-800/80 border border-emerald-700 text-emerald-200 text-[11px] font-mono">
+                <span class="w-2.5 h-2.5 rounded bg-emerald-700 border border-emerald-600"></span> 50-75%
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-[11px] font-mono">
+                <span class="w-2.5 h-2.5 rounded bg-emerald-500 shadow-sm shadow-emerald-400/50"></span> 75-100%
+              </span>
+            </div>
+          </div>
+
+          <!-- Calendar Heatmap Grid -->
+          ${renderHeatmapCalendarGrid(stats)}
+        </div>
+      `;
+    }
+
+    function renderHeatmapCalendarGrid(stats) {
+      const { year, month, daysInMonth, monthPrefix, completionRates } = stats;
+      const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 = Sun
+      const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1; // Mon = 0
+      const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+      let gridHtml = `
+        <div class="grid grid-cols-7 gap-2 text-center text-xs text-zinc-500 font-semibold mb-1 select-none">
+          ${dayNames.map(d => `<div>${d}</div>`).join('')}
+        </div>
+        <div class="grid grid-cols-7 gap-2">
+      `;
+
+      // Leading empty days
+      for (let i = 0; i < startOffset; i++) {
+        gridHtml += `<div class="h-16 sm:h-20 rounded-xl bg-zinc-950/40 border border-zinc-850/40 opacity-30"></div>`;
+      }
+
+      // Actual month days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dStr = `${monthPrefix}-${String(day).padStart(2, '0')}`;
+        const log = state.db.dailyLogs[dStr];
+        const isToday = dStr === getTodayISO();
+        const isSelected = dStr === state.currentDate;
+        const rate = completionRates[dStr] || 0;
+
+        // Specified color tiers:
+        // 0-25%: zinc-800
+        // 25-50%: emerald-950
+        // 50-75%: emerald-700
+        // 75-100%: emerald-500
+        let cellClass = 'bg-zinc-800 border-zinc-700/80 text-zinc-300';
+        let rateColor = 'text-zinc-500';
+
+        if (rate >= 75) {
+          cellClass = 'bg-emerald-500 border-emerald-400 text-zinc-950 font-bold shadow-sm shadow-emerald-500/20';
+          rateColor = 'text-zinc-950 font-extrabold';
+        } else if (rate >= 50) {
+          cellClass = 'bg-emerald-700 border-emerald-600 text-emerald-100 font-semibold';
+          rateColor = 'text-emerald-200';
+        } else if (rate >= 25) {
+          cellClass = 'bg-emerald-950 border-emerald-900 text-emerald-300 font-medium';
+          rateColor = 'text-emerald-400';
+        } else {
+          cellClass = 'bg-zinc-800 border-zinc-700/80 text-zinc-400';
+          rateColor = 'text-zinc-500';
+        }
+
+        gridHtml += `
+          <div
+            onclick="selectDateAndOpen('${dStr}')"
+            class="h-16 sm:h-20 p-2 sm:p-2.5 rounded-xl border ${cellClass} cursor-pointer transition-all hover:scale-[1.03] flex flex-col justify-between select-none ${isSelected ? 'ring-2 ring-emerald-400 ring-offset-2 ring-offset-zinc-950' : ''
+          }"
+            title="${dStr}: ${rate}% completed (Click to edit date)"
+          >
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold">${day}</span>
+              ${isToday ? '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Today"></span>' : ''}
+            </div>
+            <div class="text-[11px] font-mono text-right ${rateColor}">
+              ${rate > 0 ? `${rate}%` : log ? '0%' : '<span class="opacity-50">-</span>'}
+            </div>
+          </div>
+        `;
+      }
+
+      gridHtml += `</div>`;
+      return gridHtml;
+    }
+
+    function renderCollapsibleMonthlyAnalytics() {
+      const current = parseISODate(state.currentDate);
+      const year = current.getFullYear();
+      const month = current.getMonth();
+      const monthName = current.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const stats = calculateMonthlyStats(year, month);
+      const isOpen = state.showMonthlyAnalyticsCollapsible;
+
+      return `
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5 shadow-sm transition-all space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-bold text-zinc-100 text-sm sm:text-base">Monthly Analytics</h3>
+                  <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
+                    ${monthName}
+                  </span>
+                </div>
+                <p class="text-xs text-zinc-400 mt-0.5">Heatmap &amp; 4 key focus metrics for this month</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button
+                onclick="setScreen('monthly')"
+                class="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-750 text-zinc-300 hover:text-zinc-100 text-xs font-semibold transition"
+              >
+                <span>Full View</span>
+                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+              </button>
+              <button
+                onclick="toggleMonthlyAnalyticsCollapsible()"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-zinc-100 text-xs font-semibold transition"
+              >
+                <span>${isOpen ? 'Collapse' : 'Expand'}</span>
+                <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview row when collapsed -->
+          ${!isOpen ? `
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-zinc-800/60 text-xs">
+              <div class="text-zinc-400">Sleep: <strong class="text-indigo-300 font-mono">${stats.avgSleep}h</strong></div>
+              <div class="text-zinc-400">Study: <strong class="text-emerald-400 font-mono">${stats.totalAcademicHours}h</strong></div>
+              <div class="text-zinc-400">Sprints: <strong class="text-violet-300 font-mono">${stats.startupSprintsCount}</strong></div>
+              <div class="text-zinc-400">Lectures: <strong class="text-sky-400 font-mono">${stats.lectureAttendanceRate}%</strong></div>
+            </div>
+          ` : `
+            <div class="pt-3 border-t border-zinc-800/80 space-y-5 fade-enter">
+              ${renderMonthlyMetricCards(stats)}
+              <div class="pt-1">
+                ${renderHeatmapCard(stats)}
+              </div>
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    function renderMonthlyView() {
+      const year = state.monthView.year;
+      const month = state.monthView.month; // 0-indexed
+      const monthName = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const stats = calculateMonthlyStats(year, month);
+
+      return `
+        <div class="space-y-6 max-w-7xl mx-auto pb-16">
+          
+          <!-- Month Header Controls -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800">
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-zinc-100 flex items-center gap-2">
+                Monthly Analytics
+              </h2>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                Consistency heatmap, recovery averages, and core engineering cadence
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="shiftMonth(-1)" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-zinc-100 transition" title="Previous Month">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <span class="px-3.5 py-1.5 font-semibold text-xs rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-100 min-w-[150px] text-center font-mono">
+                ${monthName}
+              </span>
+              <button onclick="shiftMonth(1)" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-zinc-100 transition" title="Next Month">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+              <button onclick="goToCurrentMonth()" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-zinc-100 transition">
+                Current
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Monthly Metric Cards -->
+          ${renderMonthlyMetricCards(stats)}
+
+          <!-- Calendar Heatmap Card -->
+          ${renderHeatmapCard(stats)}
+
+        </div>
+      `;
+    }
+
+    function goToCurrentMonth() {
+      const now = new Date();
+      state.monthView.year = now.getFullYear();
+      state.monthView.month = now.getMonth();
+      renderApp();
+    }
+
+    function toggleMonthlyAnalyticsCollapsible() {
+      state.showMonthlyAnalyticsCollapsible = !state.showMonthlyAnalyticsCollapsible;
+      renderApp();
+    }
+
+    // =========================================================================
+    // RENDER: SETTINGS & BACKUP VIEW
+    // =========================================================================
+    function renderSettingsView() {
+      const settings = state.db.settings;
+
+      return `
+        <div class="space-y-6 max-w-3xl mx-auto pb-16">
+          
+          <div class="pb-2 border-b border-zinc-800">
+            <h2 class="text-xl sm:text-2xl font-bold text-zinc-100">
+              Backup, Sync &amp; Configuration
+            </h2>
+            <p class="text-xs text-zinc-400 mt-0.5">
+              Portable JSON backups, study targets, and local database management
+            </p>
+          </div>
+
+          <!-- Backup & Data Portability Card -->
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-zinc-800">
+              <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <i data-lucide="database" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-zinc-100 text-sm sm:text-base">Data Backup &amp; File Sync</h3>
+                <p class="text-xs text-zinc-400">Export or restore your progress anytime without loss</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <!-- Export JSON Button -->
+              <button
+                onclick="exportJSONBackup()"
+                class="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl bg-emerald-500 hover:bg-emerald-600 text-zinc-950 transition shadow-md shadow-emerald-500/20 active:scale-95"
+              >
+                <i data-lucide="download" class="w-4 h-4"></i>
+                Export JSON (tracker-backup-YYYY-MM-DD.json)
+              </button>
+
+              <!-- Import JSON Button -->
+              <button
+                onclick="triggerImportJSON()"
+                class="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 transition active:scale-95"
+              >
+                <i data-lucide="upload" class="w-4 h-4"></i>
+                Import JSON Backup
+              </button>
+
+              <!-- Reset to Sample Data -->
+              <button
+                onclick="confirmResetSampleData()"
+                class="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl bg-zinc-900 hover:bg-zinc-850 text-zinc-400 hover:text-zinc-200 border border-zinc-800 transition ml-auto"
+              >
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                Reset to Sample 30-Day Data
+              </button>
+            </div>
+          </div>
+
+          <!-- Daily Focus Targets -->
+          <div class="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-zinc-800">
+              <div class="p-2 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                <i data-lucide="sliders" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-zinc-100 text-sm sm:text-base">Daily Focus Targets</h3>
+                <p class="text-xs text-zinc-400">Benchmarks used for daily execution score calculation</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="text-xs font-semibold text-zinc-300 block mb-1">Target Study Hours</label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  max="16"
+                  value="${settings.targetStudyHours || 4}"
+                  onchange="updateSetting('targetStudyHours', parseFloat(this.value))"
+                  class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 font-mono focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label class="text-xs font-semibold text-zinc-300 block mb-1">Target Startup Hours</label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  max="16"
+                  value="${settings.targetStartupHours || 3}"
+                  onchange="updateSetting('targetStartupHours', parseFloat(this.value))"
+                  class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 font-mono focus:outline-none focus:border-violet-500"
+                />
+              </div>
+
+              <div>
+                <label class="text-xs font-semibold text-zinc-300 block mb-1">Target DSA Problems</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value="${settings.targetDsaCount || 2}"
+                  onchange="updateSetting('targetDsaCount', parseInt(this.value))"
+                  class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 font-mono focus:outline-none focus:border-sky-500"
+                />
+              </div>
+            </div>
+
+            <!-- College Subjects Config -->
+            <div class="pt-3 border-t border-zinc-800 space-y-2">
+              <label class="text-xs font-semibold text-zinc-300 block">Default College Lecture Subjects</label>
+              <div class="flex flex-wrap gap-2">
+                ${(settings.lectureSubjects || []).map(sub => `
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-zinc-800 border border-zinc-700 text-xs text-zinc-200">
+                    ${escapeHtml(sub)}
+                    <button onclick="removeLectureSubject('${escapeHtml(sub)}')" class="text-zinc-500 hover:text-rose-400">
+                      <i data-lucide="x" class="w-3 h-3"></i>
+                    </button>
+                  </span>
+                `).join('')}
+              </div>
+
+              <div class="flex items-center gap-2 pt-2 max-w-sm">
+                <input
+                  type="text"
+                  id="new-subject-input"
+                  placeholder="e.g. Operating Systems"
+                  class="px-3 py-1.5 text-xs rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500 flex-1"
+                />
+                <button
+                  onclick="addLectureSubject()"
+                  class="px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="rounded-2xl border border-rose-950/40 bg-rose-950/10 p-5 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-rose-400">Clear Local Database</h4>
+            <p class="text-xs text-zinc-400">Wipes all stored logs and resets your tracker to a fresh state.</p>
+            <button
+              onclick="confirmWipeAll()"
+              class="px-4 py-2 text-xs font-semibold rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 transition"
+            >
+              Wipe Database
+            </button>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // EVENT HANDLERS & MUTATIONS
+    // =========================================================================
+    function setScreen(screenName) {
+      state.activeScreen = screenName;
+      renderApp();
+    }
+
+    function setTodaySubTab(subTab) {
+      state.todaySubTab = subTab;
+      renderApp();
+    }
+
+    function setDate(isoStr) {
+      state.currentDate = isoStr;
+      renderApp();
+    }
+
+    function shiftDay(delta) {
+      const d = parseISODate(state.currentDate);
+      d.setDate(d.getDate() + delta);
+      state.currentDate = formatISO(d);
+      renderApp();
+    }
+
+    function shiftWeek(days) {
+      const d = parseISODate(state.currentDate);
+      d.setDate(d.getDate() + days);
+      state.currentDate = formatISO(d);
+      renderApp();
+    }
+
+    function goToCurrentWeek() {
+      state.currentDate = getTodayISO();
+      renderApp();
+    }
+
+    function shiftMonth(delta) {
+      let y = state.monthView.year;
+      let m = state.monthView.month + delta;
+      if (m > 11) {
+        m = 0;
+        y++;
+      } else if (m < 0) {
+        m = 11;
+        y--;
+      }
+      state.monthView.year = y;
+      state.monthView.month = m;
+      renderApp();
+    }
+
+    function selectDateAndOpen(dateStr) {
+      state.currentDate = dateStr;
+      state.activeScreen = 'today';
+      renderApp();
+    }
+
+    // Schedule Block mutations
+    function toggleScheduleBlock(blockId) {
+      const log = getOrInitLog(state.currentDate);
+      const b = (log.schedule_blocks || []).find(x => x.id === blockId);
+      if (b) {
+        b.completed = !b.completed;
+        if (b.category === 'college') {
+          b.lectureStatus = [b.completed, b.completed, b.completed, b.completed, b.completed, b.completed];
+          b.lecturesAttended = b.completed ? 6 : 0;
+        }
+        saveDatabase();
+        renderApp();
+      }
+    }
+
+    function toggleBlockLecture(blockId, lectureIdx) {
+      const log = getOrInitLog(state.currentDate);
+      const b = (log.schedule_blocks || []).find(x => x.id === blockId);
+      if (b) {
+        if (!b.lectureStatus) b.lectureStatus = [false, false, false, false, false, false];
+        b.lectureStatus[lectureIdx] = !b.lectureStatus[lectureIdx];
+        b.lecturesAttended = b.lectureStatus.filter(Boolean).length;
+        b.completed = b.lecturesAttended === 6;
+        saveDatabase();
+        renderApp();
+      }
+    }
+
+    function updateBlockNotes(blockId, notes) {
+      const log = getOrInitLog(state.currentDate);
+      const b = (log.schedule_blocks || []).find(x => x.id === blockId);
+      if (b) {
+        b.notes = notes;
+        saveDatabase(); // Instant auto-save to localStorage
+      }
+    }
+
+    function toggleSaturdayCollegeMode() {
+      const log = getOrInitLog(state.currentDate);
+      log.saturday_college_mode = !log.saturday_college_mode;
+      syncRoutineBlocks(log);
+      saveDatabase();
+      renderApp();
+      showToast(log.saturday_college_mode ? 'Regular College Today (9-5) enabled' : 'Switched to Weekend template');
+    }
+
+    // Sleep Mutations
+    function setSleep(hours) {
+      const log = getOrInitLog(state.currentDate);
+      log.sleep_hours = Math.max(0, Math.min(16, Math.round(hours * 10) / 10));
+      saveDatabase();
+      renderApp();
+    }
+
+    function adjustSleep(delta) {
+      const log = getOrInitLog(state.currentDate);
+      const current = (log.sleep_hours !== undefined && log.sleep_hours !== null) ? log.sleep_hours : 7.0;
+      setSleep(current + delta);
+    }
+
+    // Task Mutations
+    function toggleTask(taskId, category) {
+      const log = getOrInitLog(state.currentDate);
+      const key = category === 'academic' ? 'academic_tasks' : 'startup_tasks';
+      const t = (log[key] || []).find(x => x.id === taskId);
+      if (t) {
+        t.completed = !t.completed;
+        saveDatabase();
+        renderApp();
+      }
+    }
+
+    function deleteTask(taskId, category) {
+      const log = getOrInitLog(state.currentDate);
+      const key = category === 'academic' ? 'academic_tasks' : 'startup_tasks';
+      log[key] = (log[key] || []).filter(x => x.id !== taskId);
+      saveDatabase();
+      renderApp();
+      showToast('Task removed');
+    }
+
+    function promptAddTask(category) {
+      openQuickAddModal(category);
+    }
+
+    // Lecture Mutations
+    function toggleLectureItem(lecId) {
+      const log = getOrInitLog(state.currentDate);
+      const l = (log.lectures || []).find(x => x.id === lecId);
+      if (l) {
+        l.attended = !l.attended;
+        saveDatabase();
+        renderApp();
+      }
+    }
+
+    function updateLectureItem(lecId, field, val) {
+      const log = getOrInitLog(state.currentDate);
+      const l = (log.lectures || []).find(x => x.id === lecId);
+      if (l) {
+        l[field] = val;
+        saveDatabase();
+      }
+    }
+
+    function deleteLectureItem(lecId) {
+      const log = getOrInitLog(state.currentDate);
+      log.lectures = (log.lectures || []).filter(x => x.id !== lecId);
+      saveDatabase();
+      renderApp();
+      showToast('Lecture removed');
+    }
+
+    function promptAddLecture() {
+      openQuickAddModal('lecture');
+    }
+
+    // Vitals Mutations
+    function toggleWorkout() {
+      const log = getOrInitLog(state.currentDate);
+      log.workout_completed = !log.workout_completed;
+      saveDatabase();
+      renderApp();
+    }
+
+    function adjustDsa(delta) {
+      const log = getOrInitLog(state.currentDate);
+      log.dsa_solved = Math.max(0, (log.dsa_solved || 0) + delta);
+      saveDatabase();
+      renderApp();
+    }
+
+    function adjustStudyHours(delta) {
+      const log = getOrInitLog(state.currentDate);
+      log.study_hours = Math.max(0, (log.study_hours || 0) + delta);
+      saveDatabase();
+      renderApp();
+    }
+
+    function adjustStartupHours(delta) {
+      const log = getOrInitLog(state.currentDate);
+      log.startup_hours = Math.max(0, (log.startup_hours || 0) + delta);
+      saveDatabase();
+      renderApp();
+    }
+
+    function adjustWater(delta) {
+      const log = getOrInitLog(state.currentDate);
+      log.water_liters = Math.max(0, Number(((log.water_liters || 0) + delta).toFixed(2)));
+      saveDatabase();
+      renderApp();
+    }
+
+    function setMood(m) {
+      const log = getOrInitLog(state.currentDate);
+      log.mood = m;
+      saveDatabase();
+      renderApp();
+    }
+
+    function updateDailyHighlight(val) {
+      const log = getOrInitLog(state.currentDate);
+      log.daily_highlight = val;
+      saveDatabase();
+    }
+
+    // Settings Mutations
+    function updateSetting(key, val) {
+      state.db.settings[key] = val;
+      saveDatabase();
+      renderApp();
+      showToast('Settings saved');
+    }
+
+    function removeLectureSubject(sub) {
+      state.db.settings.lectureSubjects = (state.db.settings.lectureSubjects || []).filter(s => s !== sub);
+      saveDatabase();
+      renderApp();
+    }
+
+    function addLectureSubject() {
+      const input = document.getElementById('new-subject-input');
+      if (!input || !input.value.trim()) return;
+      const sub = input.value.trim();
+      if (!state.db.settings.lectureSubjects) state.db.settings.lectureSubjects = [];
+      if (!state.db.settings.lectureSubjects.includes(sub)) {
+        state.db.settings.lectureSubjects.push(sub);
+        saveDatabase();
+        renderApp();
+        showToast(`Added subject: ${sub}`);
+      }
+    }
+
+    function confirmResetSampleData() {
+      if (confirm('Reset to initial 30-day sample data? Current changes will be overwritten.')) {
+        state.db = generateSeedDatabase();
+        saveDatabase();
+        renderApp();
+        showToast('Database reset to 30-day sample dataset');
+      }
+    }
+
+    function confirmWipeAll() {
+      if (confirm('Are you sure you want to completely erase the tracker database? This cannot be undone.')) {
+        state.db = {
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          settings: generateSeedDatabase().settings,
+          dailyLogs: {},
+        };
+        saveDatabase();
+        renderApp();
+        showToast('Database wiped.');
+      }
+    }
+
+    function triggerImportJSON() {
+      const input = document.getElementById('file-import-input');
+      if (input) input.click();
+    }
+
+    // =========================================================================
+    // QUICK ADD MODAL LOGIC
+    // =========================================================================
+    function openQuickAddModal(type = 'academic') {
+      state.qaType = type;
+      updateQuickAddTabs();
+      const modal = document.getElementById('quick-add-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        const titleInput = document.getElementById('qa-input-title');
+        if (titleInput) {
+          titleInput.value = '';
+          titleInput.focus();
+        }
+      }
+    }
+
+    function closeQuickAddModal() {
+      const modal = document.getElementById('quick-add-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function updateQuickAddTabs() {
+      const btnAcad = document.getElementById('qa-tab-academic');
+      const btnStart = document.getElementById('qa-tab-startup');
+      const btnLec = document.getElementById('qa-tab-lecture');
+      const taskExtras = document.getElementById('qa-task-extras');
+      const lectureExtras = document.getElementById('qa-lecture-extras');
+
+      [btnAcad, btnStart, btnLec].forEach(b => {
+        b.className = 'qa-type-btn py-2 px-2.5 rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200 flex items-center justify-center gap-1.5';
+      });
+
+      if (state.qaType === 'academic') {
+        btnAcad.className = 'qa-type-btn py-2 px-2.5 rounded-xl border bg-emerald-500/15 border-emerald-500/40 text-emerald-300 flex items-center justify-center gap-1.5';
+        taskExtras.classList.remove('hidden');
+        lectureExtras.classList.add('hidden');
+      } else if (state.qaType === 'startup') {
+        btnStart.className = 'qa-type-btn py-2 px-2.5 rounded-xl border bg-violet-500/15 border-violet-500/40 text-violet-300 flex items-center justify-center gap-1.5';
+        taskExtras.classList.remove('hidden');
+        lectureExtras.classList.add('hidden');
+      } else {
+        btnLec.className = 'qa-type-btn py-2 px-2.5 rounded-xl border bg-emerald-500/15 border-emerald-500/40 text-emerald-300 flex items-center justify-center gap-1.5';
+        taskExtras.classList.add('hidden');
+        lectureExtras.classList.remove('hidden');
+      }
+    }
+
+    // =========================================================================
+    // ESCAPE HTML HELPER
+    // =========================================================================
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // =========================================================================
+    // MAIN APP RENDER LOOP
+    // =========================================================================
+    function renderApp() {
+      // 1. Sync Date input value
+      const datePicker = document.getElementById('date-picker-input');
+      if (datePicker && datePicker.value !== state.currentDate) {
+        datePicker.value = state.currentDate;
+      }
+
+      // 2. Sync Desktop Navigation Tabs
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        const navTarget = btn.getAttribute('data-nav');
+        if (navTarget === state.activeScreen) {
+          btn.className = 'nav-tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-100 shadow border border-zinc-700/60 font-bold';
+        } else {
+          btn.className = 'nav-tab-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 transition';
+        }
+      });
+
+      // 3. Sync Mobile Bottom Navigation Tabs
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        const navTarget = btn.getAttribute('data-nav');
+        if (navTarget === state.activeScreen) {
+          btn.className = 'mobile-nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-emerald-400 font-bold';
+        } else {
+          btn.className = 'mobile-nav-btn flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-zinc-400 hover:text-zinc-200 transition';
+        }
+      });
+
+      // 4. Render Active Viewport Content
+      const viewport = document.getElementById('app-viewport');
+      if (!viewport) return;
+
+      if (state.activeScreen === 'today') {
+        viewport.innerHTML = renderTodayView();
+      } else if (state.activeScreen === 'weekly') {
+        viewport.innerHTML = renderWeeklyView();
+      } else if (state.activeScreen === 'monthly') {
+        viewport.innerHTML = renderMonthlyView();
+      } else if (state.activeScreen === 'settings') {
+        viewport.innerHTML = renderSettingsView();
+      }
+
+      // 5. Initialize Lucide Icons for dynamic content
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    // =========================================================================
+    // INITIALIZATION & EVENT LISTENERS
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      // Load or initialize DB
+      state.db = loadDatabase();
+
+      // Top Navigation Button Listeners
+      document.getElementById('btn-prev-day')?.addEventListener('click', () => shiftDay(-1));
+      document.getElementById('btn-next-day')?.addEventListener('click', () => shiftDay(1));
+      document.getElementById('btn-today')?.addEventListener('click', () => setDate(getTodayISO()));
+
+      // Date Picker Change Listener
+      document.getElementById('date-picker-input')?.addEventListener('change', (e) => {
+        if (e.target.value) setDate(e.target.value);
+      });
+
+      // Desktop Nav Tabs
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const navTarget = btn.getAttribute('data-nav');
+          if (navTarget) setScreen(navTarget);
+        });
+      });
+
+      // Mobile Nav Tabs
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const navTarget = btn.getAttribute('data-nav');
+          if (navTarget) setScreen(navTarget);
+        });
+      });
+
+      // Quick Add Modal Buttons
+      document.getElementById('btn-open-quick-add')?.addEventListener('click', () => openQuickAddModal());
+      document.getElementById('btn-close-quick-add')?.addEventListener('click', closeQuickAddModal);
+      document.getElementById('btn-cancel-quick-add')?.addEventListener('click', closeQuickAddModal);
+
+      // Quick Add Category Switchers
+      document.getElementById('qa-tab-academic')?.addEventListener('click', () => {
+        state.qaType = 'academic';
+        updateQuickAddTabs();
+      });
+      document.getElementById('qa-tab-startup')?.addEventListener('click', () => {
+        state.qaType = 'startup';
+        updateQuickAddTabs();
+      });
+      document.getElementById('qa-tab-lecture')?.addEventListener('click', () => {
+        state.qaType = 'lecture';
+        updateQuickAddTabs();
+      });
+
+      // Quick Add Form Submit
+      document.getElementById('quick-add-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('qa-input-title').value.trim();
+        if (!title) return;
+
+        const log = getOrInitLog(state.currentDate);
+
+        if (state.qaType === 'academic' || state.qaType === 'startup') {
+          const priority = document.getElementById('qa-select-priority').value;
+          const timeEstimate = document.getElementById('qa-input-estimate').value.trim() || '30m';
+          const key = state.qaType === 'academic' ? 'academic_tasks' : 'startup_tasks';
+
+          if (!log[key]) log[key] = [];
+          log[key].push({
+            id: generateId(`task-${state.qaType}`),
+            title,
+            completed: false,
+            category: state.qaType,
+            priority,
+            timeEstimate,
+          });
+
+          showToast(`Added ${state.qaType} task: ${title}`);
+        } else {
+          // Lecture
+          const timeSlot = document.getElementById('qa-input-slot').value.trim() || 'Standard Slot';
+          const topic = document.getElementById('qa-input-topic').value.trim() || '';
+
+          if (!log.lectures) log.lectures = [];
+          log.lectures.push({
+            id: generateId('lec'),
+            lecture_number: log.lectures.length + 1,
+            subject_name: title,
+            attended: false,
+            topic,
+            notes: '',
+            time_slot: timeSlot,
+          });
+
+          showToast(`Added lecture: ${title}`);
+        }
+
+        saveDatabase();
+        closeQuickAddModal();
+        renderApp();
+      });
+
+      // File Import Listener
+      document.getElementById('file-import-input')?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          handleImportFile(file);
+          e.target.value = ''; // Reset input
+        }
+      });
+
+      // Keyboard Shortcut: ESC closes modal, 'n' opens quick add
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeQuickAddModal();
+        } else if ((e.key === 'n' || e.key === 'N') && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+          openQuickAddModal();
+        }
+      });
+
+      // Initial Render
+      renderApp();
+    });
+  </script>
+</body>
+
+</html>
